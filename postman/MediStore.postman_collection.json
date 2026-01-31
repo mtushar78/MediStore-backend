@@ -1,0 +1,450 @@
+{
+  "info": {
+    "name": "MediStore API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "accessToken", "value": "" },
+    { "key": "customerToken", "value": "" },
+    { "key": "sellerToken", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "categoryId", "value": "" },
+    { "key": "medicineId", "value": "" },
+    { "key": "orderId", "value": "" },
+    { "key": "reviewMedicineId", "value": "" }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "const token = pm.collectionVariables.get('accessToken');",
+          "if (token) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${token}` });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /api/v1/health",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/health", "host": ["{{baseUrl}}"], "path": ["api", "v1", "health"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register (customer) -> sets customerToken",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json?.data?.accessToken) {",
+                  "  pm.collectionVariables.set('customerToken', json.data.accessToken);",
+                  "}",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Customer One\",\n  \"email\": \"customer1@example.com\",\n  \"password\": \"pass1234\",\n  \"role\": \"customer\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "register"] }
+          }
+        },
+        {
+          "name": "Register (seller) -> sets sellerToken",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json?.data?.accessToken) {",
+                  "  pm.collectionVariables.set('sellerToken', json.data.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Seller One\",\n  \"email\": \"seller1@example.com\",\n  \"password\": \"pass1234\",\n  \"role\": \"seller\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "register"] }
+          }
+        },
+        {
+          "name": "Login -> sets accessToken",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json?.data?.accessToken) {",
+                  "  pm.collectionVariables.set('accessToken', json.data.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"customer1@example.com\",\n  \"password\": \"pass1234\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "login"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "GET /api/v1/categories (public)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/categories", "host": ["{{baseUrl}}"], "path": ["api", "v1", "categories"] }
+          }
+        },
+        {
+          "name": "POST /api/v1/categories (admin) -> sets categoryId",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const t = pm.collectionVariables.get('adminToken');",
+                  "if (t) pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${t}` });"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json?.data?.id) pm.collectionVariables.set('categoryId', json.data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pain Relief\",\n  \"description\": \"Pain relief medicines\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/categories", "host": ["{{baseUrl}}"], "path": ["api", "v1", "categories"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Medicines",
+      "item": [
+        {
+          "name": "GET /api/v1/medicines (public)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/medicines", "host": ["{{baseUrl}}"], "path": ["api", "v1", "medicines"] }
+          }
+        },
+        {
+          "name": "POST /api/v1/medicines (seller create) -> sets medicineId",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const t = pm.collectionVariables.get('sellerToken');",
+                  "if (t) pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${t}` });"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json?.data?.id) pm.collectionVariables.set('medicineId', json.data.id);",
+                  "if (json?.data?.id) pm.collectionVariables.set('reviewMedicineId', json.data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Paracetamol\",\n  \"categoryId\": \"{{categoryId}}\",\n  \"manufacturer\": \"ACME Pharma\",\n  \"unit\": \"10 tablets\",\n  \"price\": 10,\n  \"stock\": 100,\n  \"images\": [\"https://example.com/1.png\"],\n  \"description\": \"For fever and pain\",\n  \"isActive\": true\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/medicines", "host": ["{{baseUrl}}"], "path": ["api", "v1", "medicines"] }
+          }
+        },
+        {
+          "name": "GET /api/v1/medicines/:id (public)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicines/{{medicineId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicines", "{{medicineId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cart (customer)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const t = pm.collectionVariables.get('customerToken');",
+              "if (t) pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${t}` });"
+            ]
+          }
+        }
+      ],
+      "item": [
+        {
+          "name": "GET /api/v1/cart",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/cart", "host": ["{{baseUrl}}"], "path": ["api", "v1", "cart"] } }
+        },
+        {
+          "name": "POST /api/v1/cart/items",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"medicineId\": \"{{medicineId}}\",\n  \"quantity\": 1\n}" },
+            "url": { "raw": "{{baseUrl}}/api/v1/cart/items", "host": ["{{baseUrl}}"], "path": ["api", "v1", "cart", "items"] }
+          }
+        },
+        {
+          "name": "PATCH /api/v1/cart/items/:medicineId",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"quantity\": 2\n}" },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cart/items/{{medicineId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cart", "items", "{{medicineId}}"]
+            }
+          }
+        },
+        {
+          "name": "DELETE /api/v1/cart/items/:medicineId",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cart/items/{{medicineId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cart", "items", "{{medicineId}}"]
+            }
+          }
+        },
+        {
+          "name": "DELETE /api/v1/cart (clear)",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/v1/cart", "host": ["{{baseUrl}}"], "path": ["api", "v1", "cart"] } }
+        }
+      ]
+    },
+    {
+      "name": "Orders (customer)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const t = pm.collectionVariables.get('customerToken');",
+              "if (t) pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${t}` });"
+            ]
+          }
+        }
+      ],
+      "item": [
+        {
+          "name": "POST /api/v1/orders (create) -> sets orderId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json?.data?.id) pm.collectionVariables.set('orderId', json.data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    { \"medicineId\": \"{{medicineId}}\", \"quantity\": 1 }\n  ],\n  \"shippingAddress\": {\n    \"name\": \"Customer One\",\n    \"phone\": \"+8801...\",\n    \"addressLine1\": \"House 1\",\n    \"city\": \"Dhaka\",\n    \"area\": \"Mirpur\",\n    \"notes\": \"Call before delivery\"\n  },\n  \"paymentMethod\": \"COD\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/orders", "host": ["{{baseUrl}}"], "path": ["api", "v1", "orders"] }
+          }
+        },
+        {
+          "name": "GET /api/v1/orders",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/orders", "host": ["{{baseUrl}}"], "path": ["api", "v1", "orders"] } }
+        },
+        {
+          "name": "GET /api/v1/orders/:id",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/orders/{{orderId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "orders", "{{orderId}}"] }
+          }
+        },
+        {
+          "name": "PATCH /api/v1/orders/:id/cancel",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders/{{orderId}}/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders", "{{orderId}}", "cancel"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders (seller)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const t = pm.collectionVariables.get('sellerToken');",
+              "if (t) pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${t}` });"
+            ]
+          }
+        }
+      ],
+      "item": [
+        {
+          "name": "GET /api/v1/orders/seller (flat items)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/orders/seller", "host": ["{{baseUrl}}"], "path": ["api", "v1", "orders", "seller"] }
+          }
+        },
+        {
+          "name": "PATCH /api/v1/orders/seller/:id/status",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"PROCESSING\"\n}" },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders/seller/{{orderId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders", "seller", "{{orderId}}", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "GET /api/v1/reviews/medicines/:id/reviews (public)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews/medicines/{{reviewMedicineId}}/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reviews", "medicines", "{{reviewMedicineId}}", "reviews"]
+            }
+          }
+        },
+        {
+          "name": "POST /api/v1/reviews (customer)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const t = pm.collectionVariables.get('customerToken');",
+                  "if (t) pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${t}` });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicineId\": \"{{medicineId}}\",\n  \"orderId\": \"{{orderId}}\",\n  \"rating\": 5,\n  \"comment\": \"Works well\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/reviews", "host": ["{{baseUrl}}"], "path": ["api", "v1", "reviews"] }
+          }
+        },
+        {
+          "name": "GET /api/v1/reviews/me (customer)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const t = pm.collectionVariables.get('customerToken');",
+                  "if (t) pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${t}` });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/reviews/me", "host": ["{{baseUrl}}"], "path": ["api", "v1", "reviews", "me"] }
+          }
+        }
+      ]
+    }
+  ]
+}
