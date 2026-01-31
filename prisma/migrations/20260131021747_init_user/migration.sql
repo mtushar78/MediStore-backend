@@ -1,0 +1,24 @@
+-- CreateEnum
+CREATE TYPE "UserRole" AS ENUM ('customer', 'seller', 'admin');
+
+-- CreateEnum
+CREATE TYPE "UserStatus" AS ENUM ('active', 'banned');
+
+-- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "passwordHash" TEXT NOT NULL,
+    "role" "UserRole" NOT NULL,
+    "status" "UserStatus" NOT NULL DEFAULT 'active',
+    "phone" TEXT,
+    "address" JSONB,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");

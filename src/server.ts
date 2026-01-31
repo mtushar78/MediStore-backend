@@ -12,7 +12,6 @@ export const startServer = async (): Promise<http.Server> => {
 
   await new Promise<void>((resolve) => {
     server.listen(port, () => {
-      // eslint-disable-next-line no-console
       console.log(`[medistore] server listening on port ${port}`);
       resolve();
     });
