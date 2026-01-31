@@ -19,17 +19,21 @@ enum UserStatus {
 }
 
 model User {
-  id           String     @id @default(uuid())
+  id           String      @id @default(uuid())
   name         String
-  email        String     @unique
+  email        String      @unique
   passwordHash String
   role         UserRole
-  status       UserStatus @default(active)
+  status       UserStatus  @default(active)
   phone        String?
   address      Json?
   medicines    Medicine[]
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  cart         Cart?
+  orders       Order[]
+  soldItems    OrderItem[]
+  reviews      Review[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 }
 
 model Category {
@@ -44,29 +48,118 @@ model Category {
 }
 
 model Medicine {
-  id           String   @id @default(uuid())
+  id           String      @id @default(uuid())
   name         String
-  slug         String?  @unique
+  slug         String?     @unique
   categoryId   String
-  category     Category @relation(fields: [categoryId], references: [id])
+  category     Category    @relation(fields: [categoryId], references: [id])
   sellerId     String
-  seller       User     @relation(fields: [sellerId], references: [id])
+  seller       User        @relation(fields: [sellerId], references: [id])
   manufacturer String
   unit         String
   price        Float
   stock        Int
   images       String[]
   description  String
-  isActive     Boolean  @default(true)
-  ratingAvg    Float    @default(0)
-  ratingCount  Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  isActive     Boolean     @default(true)
+  ratingAvg    Float       @default(0)
+  ratingCount  Int         @default(0)
+  cartItems    CartItem[]
+  orderItems   OrderItem[]
+  reviews      Review[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 
   @@index([categoryId])
   @@index([sellerId])
 }
 
+model Cart {
+  id         String     @id @default(uuid())
+  customerId String     @unique
+  customer   User       @relation(fields: [customerId], references: [id])
+  items      CartItem[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
 
+model CartItem {
+  id         String   @id @default(uuid())
+  cartId     String
+  cart       Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  medicineId String
+  medicine   Medicine @relation(fields: [medicineId], references: [id])
+  quantity   Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
+  @@unique([cartId, medicineId])
+  @@index([medicineId])
+}
 
+enum PaymentMethod {
+  COD
+}
+
+enum OrderStatus {
+  PLACED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model Order {
+  id              String        @id @default(uuid())
+  customerId      String
+  customer        User          @relation(fields: [customerId], references: [id])
+  items           OrderItem[]
+  subtotal        Float
+  shippingFee     Float         @default(0)
+  total           Float
+  shippingAddress Json
+  paymentMethod   PaymentMethod
+  status          OrderStatus   @default(PLACED)
+  reviews         Review[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([customerId])
+  @@index([status])
+}
+
+model OrderItem {
+  id            String   @id @default(uuid())
+  orderId       String
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  medicineId    String
+  medicine      Medicine @relation(fields: [medicineId], references: [id])
+  sellerId      String
+  seller        User     @relation(fields: [sellerId], references: [id])
+  nameSnapshot  String
+  priceSnapshot Float
+  quantity      Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([medicineId])
+  @@index([sellerId])
+}
+
+model Review {
+  id         String   @id @default(uuid())
+  medicineId String
+  medicine   Medicine @relation(fields: [medicineId], references: [id])
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id])
+  customerId String
+  customer   User     @relation(fields: [customerId], references: [id])
+  rating     Int
+  comment    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([orderId, medicineId])
+  @@index([medicineId])
+  @@index([customerId])
+}
