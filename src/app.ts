@@ -8,7 +8,6 @@ export const createApp = (): Application => {
   app.use(cors());
   app.use(express.json());
 
-  // Minimal "runs" route (no business functionality)
   app.get('/', (_req: Request, res: Response) => {
     res.status(200).json({ success: true, message: 'MediStore API is running' });
   });
