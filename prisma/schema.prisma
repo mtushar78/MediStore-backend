@@ -27,9 +27,46 @@ model User {
   status       UserStatus @default(active)
   phone        String?
   address      Json?
+  medicines    Medicine[]
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 }
+
+model Category {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  slug        String     @unique
+  description String?
+  isActive    Boolean    @default(true)
+  medicines   Medicine[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Medicine {
+  id           String   @id @default(uuid())
+  name         String
+  slug         String?  @unique
+  categoryId   String
+  category     Category @relation(fields: [categoryId], references: [id])
+  sellerId     String
+  seller       User     @relation(fields: [sellerId], references: [id])
+  manufacturer String
+  unit         String
+  price        Float
+  stock        Int
+  images       String[]
+  description  String
+  isActive     Boolean  @default(true)
+  ratingAvg    Float    @default(0)
+  ratingCount  Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([categoryId])
+  @@index([sellerId])
+}
+
 
 
 

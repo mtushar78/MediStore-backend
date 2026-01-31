@@ -1,6 +1,8 @@
 import cors from 'cors';
 import express, { Application, Request, Response } from 'express';
 import { authRouter } from './modules/auth/auth.routes';
+import { categoriesRouter } from './modules/categories/categories.routes';
+import { medicinesRouter } from './modules/medicines/medicines.routes';
 import { usersRouter } from './modules/users/users.routes';
 
 export const createApp = (): Application => {
@@ -21,6 +23,8 @@ export const createApp = (): Application => {
 
   // Routes
   app.use('/api/v1/auth', authRouter);
+  app.use('/api/v1/categories', categoriesRouter);
+  app.use('/api/v1/medicines', medicinesRouter);
   app.use('/api/v1/users', usersRouter);
 
   // 404 fallback
