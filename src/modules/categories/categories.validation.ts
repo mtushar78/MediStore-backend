@@ -14,7 +14,7 @@ export const CategoriesValidation = {
   create: z.object({
     body: z.object({
       name: z.string().min(1),
-      description: z.string().min(1).optional(),
+      description: z.string().optional(),
     }),
     params: z.object({}).optional(),
     query: z.object({}).optional(),
