@@ -13,7 +13,7 @@ export const MedicinesValidation = {
         sellerId: z.string().uuid().optional(),
         page: z.coerce.number().int().positive().optional(),
         limit: z.coerce.number().int().positive().max(100).optional(),
-        sortBy: z.enum(['price', 'createdAt', 'ratingAvg']).optional(),
+        sortBy: z.enum(['price', 'createdAt', 'ratingAvg', 'name', 'manufacturer', 'stock']).optional(),
         sortOrder: z.enum(['asc', 'desc']).optional(),
       })
       .optional(),
