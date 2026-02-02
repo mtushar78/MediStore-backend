@@ -1,6 +1,7 @@
 import cors from 'cors';
 import express, { Application, Request, Response } from 'express';
 import { authRouter } from './modules/auth/auth.routes';
+import { adminRouter } from './modules/admin/admin.routes';
 import { cartRouter } from './modules/cart/cart.routes';
 import { categoriesRouter } from './modules/categories/categories.routes';
 import { medicinesRouter } from './modules/medicines/medicines.routes';
@@ -12,7 +13,10 @@ export const createApp = (): Application => {
   const app = express();
 
   // Core middlewares
-  app.use(cors());
+  app.use(cors({
+    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    credentials: true
+  }));
   app.use(express.json());
 
   app.get('/', (_req: Request, res: Response) => {
@@ -26,6 +30,7 @@ export const createApp = (): Application => {
 
   // Routes
   app.use('/api/v1/auth', authRouter);
+  app.use('/api/v1/admin', adminRouter);
   app.use('/api/v1/cart', cartRouter);
   app.use('/api/v1/categories', categoriesRouter);
   app.use('/api/v1/medicines', medicinesRouter);
