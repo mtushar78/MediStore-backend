@@ -15,7 +15,7 @@ export const ReviewsValidation = {
   create: z.object({
     body: z.object({
       medicineId: z.string().uuid(),
-      orderId: z.string().uuid(),
+      orderId: z.string().uuid().optional(),
       rating: z.number().int().min(1).max(5),
       comment: z.string().min(1).optional(),
     }),

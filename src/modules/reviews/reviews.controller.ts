@@ -21,6 +21,7 @@ export const ReviewsController = {
       const review = await ReviewsService.create(customerId, body);
       return sendResponse(res, { statusCode: 201, success: true, data: review });
     } catch (e: any) {
+      console.log(e);
       const code = String(e?.message || '');
       if (code === 'ORDER_NOT_FOUND') return res.status(404).json({ success: false, message: 'Order not found' });
       if (code === 'ORDER_NOT_DELIVERED') return res.status(400).json({ success: false, message: 'Order not delivered' });
