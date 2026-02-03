@@ -13,10 +13,10 @@ export const createApp = (): Application => {
   const app = express();
 
   // Core middlewares
-  app.use(cors({
-    origin: ['https://medistore-frontend-alpha.vercel.app/'],
-    credentials: true
-  }));
+  // app.use(cors({
+  //   origin: ['https://medistore-frontend-alpha.vercel.app'],
+  //   credentials: true
+  // }));
   app.use(express.json());
 
   app.get('/', (_req: Request, res: Response) => {
