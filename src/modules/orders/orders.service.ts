@@ -148,9 +148,20 @@ export const OrdersService = {
           subtotal: true,
           shippingFee: true,
           total: true,
+          shippingAddress: true,
           paymentMethod: true,
           status: true,
           createdAt: true,
+          items: {
+            select: {
+              id: true,
+              medicineId: true,
+              sellerId: true,
+              nameSnapshot: true,
+              priceSnapshot: true,
+              quantity: true,
+            },
+          },
         },
       }),
     ]);

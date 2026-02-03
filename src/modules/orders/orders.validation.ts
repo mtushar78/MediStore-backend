@@ -9,9 +9,11 @@ const shippingAddressSchema = z.object({
   name: z.string().min(1),
   phone: z.string().min(1),
   addressLine1: z.string().min(1),
+  addressLine2: z.string().optional(),
   city: z.string().min(1),
   area: z.string().min(1),
-  notes: z.string().min(1).optional(),
+  postalCode: z.string().optional(),
+  notes: z.string().optional(),
 });
 
 export const OrdersValidation = {
