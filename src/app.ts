@@ -14,7 +14,7 @@ export const createApp = (): Application => {
 
   // Core middlewares
   app.use(cors({
-    origin: ['*'],
+    origin: ['https://medistore-backend-livid.vercel.app'],
     credentials: true
   }));
   app.use(express.json());
