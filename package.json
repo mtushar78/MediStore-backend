@@ -9,6 +9,7 @@
     "seed:admin": "ts-node-dev --transpile-only src/scripts/seedAdmin.ts",
     "seed:catalog": "ts-node-dev --transpile-only src/scripts/seedCatalog.ts",
     "seed:all": "ts-node-dev --transpile-only src/scripts/seedAll.ts",
+    "update:images": "ts-node-dev --transpile-only src/scripts/updateMedicineImages.ts",
     "migrate": "ts-node-dev --transpile-only src/scripts/migrate.ts",
     "migrate:deploy": "prisma migrate deploy --schema=prisma/schema.prisma",
     "prisma:generate": "prisma generate --schema=prisma/schema.prisma",
