@@ -9,8 +9,8 @@ const hashPassword = (password: string) => {
 };
 
 const main = async () => {
-  const email = process.env.ADMIN_EMAIL || 'admin@medistore.local';
-  const password = process.env.ADMIN_PASSWORD || 'admin1234';
+  const email = process.env.ADMIN_EMAIL || 'admin@medistore.com';
+  const password = process.env.ADMIN_PASSWORD || 'admin123';
   const name = process.env.ADMIN_NAME || 'Admin';
 
   const user = await prisma.user.upsert({
