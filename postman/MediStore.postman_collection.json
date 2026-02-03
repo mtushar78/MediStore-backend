@@ -12,7 +12,9 @@
     { "key": "categoryId", "value": "" },
     { "key": "medicineId", "value": "" },
     { "key": "orderId", "value": "" },
-    { "key": "reviewMedicineId", "value": "" }
+    { "key": "reviewMedicineId", "value": "" },
+    { "key": "userId", "value": "" },
+    { "key": "reviewId", "value": "" }
   ],
   "event": [
     {
@@ -179,6 +181,63 @@
           "request": {
             "method": "GET",
             "url": { "raw": "{{baseUrl}}/api/v1/medicines", "host": ["{{baseUrl}}"], "path": ["api", "v1", "medicines"] }
+          }
+        },
+        {
+          "name": "GET /api/v1/medicines (public) - Search + Filters + Sort + Pagination",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicines?q=med&categoryId={{categoryId}}&manufacturer=pharma&minPrice=20&maxPrice=200&inStock=true&page=1&limit=12&sortBy=price&sortOrder=asc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicines"],
+              "query": [
+                { "key": "q", "value": "med", "description": "Search by medicine name (contains, case-insensitive)" },
+                { "key": "categoryId", "value": "{{categoryId}}", "description": "Filter by categoryId" },
+                { "key": "manufacturer", "value": "pharma", "description": "Filter by manufacturer (contains, case-insensitive)" },
+                { "key": "minPrice", "value": "20", "description": "Minimum price" },
+                { "key": "maxPrice", "value": "200", "description": "Maximum price" },
+                { "key": "inStock", "value": "true", "description": "true -> stock > 0" },
+                { "key": "page", "value": "1", "description": "Page number (default 1)" },
+                { "key": "limit", "value": "12", "description": "Page size (default 12)" },
+                { "key": "sortBy", "value": "price", "description": "price | ratingAvg | createdAt" },
+                { "key": "sortOrder", "value": "asc", "description": "asc | desc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v1/medicines (public) - Sort by newest",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicines?sortBy=createdAt&sortOrder=desc&page=1&limit=12",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicines"],
+              "query": [
+                { "key": "sortBy", "value": "createdAt" },
+                { "key": "sortOrder", "value": "desc" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "12" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v1/medicines (public) - Sort by rating",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicines?sortBy=ratingAvg&sortOrder=desc&page=1&limit=12",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicines"],
+              "query": [
+                { "key": "sortBy", "value": "ratingAvg" },
+                { "key": "sortOrder", "value": "desc" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "12" }
+              ]
+            }
           }
         },
         {
@@ -382,6 +441,65 @@
               "raw": "{{baseUrl}}/api/v1/orders/seller/{{orderId}}/status",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "orders", "seller", "{{orderId}}", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const t = pm.collectionVariables.get('adminToken');",
+              "if (t) pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${t}` });"
+            ]
+          }
+        }
+      ],
+      "item": [
+        {
+          "name": "GET /api/v1/admin/users",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/admin/users", "host": ["{{baseUrl}}"], "path": ["api", "v1", "admin", "users"] }
+          }
+        },
+        {
+          "name": "GET /api/v1/admin/users/:id",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "PATCH /api/v1/admin/users/:id/status",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"banned\"\n}" },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/users/{{userId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "users", "{{userId}}", "status"]
+            }
+          }
+        },
+        {
+          "name": "DELETE /api/v1/admin/reviews/:id",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/reviews/{{reviewId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "reviews", "{{reviewId}}"]
             }
           }
         }

@@ -150,8 +150,8 @@ model Review {
   id         String   @id @default(uuid())
   medicineId String
   medicine   Medicine @relation(fields: [medicineId], references: [id])
-  orderId    String
-  order      Order    @relation(fields: [orderId], references: [id])
+  orderId    String?
+  order      Order?   @relation(fields: [orderId], references: [id])
   customerId String
   customer   User     @relation(fields: [customerId], references: [id])
   rating     Int
@@ -159,7 +159,6 @@ model Review {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  @@unique([orderId, medicineId])
   @@index([medicineId])
   @@index([customerId])
 }

@@ -57,23 +57,26 @@ export const ReviewsService = {
     return { items, meta: { page, limit, total, totalPages: Math.ceil(total / limit) || 1 } };
   },
 
-  async create(customerId: string, payload: { medicineId: string; orderId: string; rating: number; comment?: string }) {
+  async create(customerId: string, payload: { medicineId: string; orderId?: string; rating: number; comment?: string }) {
     return prisma.$transaction(async (tx) => {
-      const order = await tx.order.findFirst({
-        where: { id: payload.orderId, customerId },
-        select: { id: true, status: true, items: { select: { medicineId: true } } },
-      });
-      if (!order) throw new Error('ORDER_NOT_FOUND');
-      if (order.status !== 'DELIVERED') throw new Error('ORDER_NOT_DELIVERED');
+      // Only validate order if orderId is provided
+      if (payload.orderId) {
+        const order = await tx.order.findFirst({
+          where: { id: payload.orderId, customerId },
+          select: { id: true, status: true, items: { select: { medicineId: true } } },
+        });
+        if (!order) throw new Error('ORDER_NOT_FOUND');
+        if (order.status !== 'DELIVERED') throw new Error('ORDER_NOT_DELIVERED');
 
-      const hasMedicine = order.items.some((it) => it.medicineId === payload.medicineId);
-      if (!hasMedicine) throw new Error('NOT_PURCHASED');
+        const hasMedicine = order.items.some((it) => it.medicineId === payload.medicineId);
+        if (!hasMedicine) throw new Error('NOT_PURCHASED');
+      }
 
       try {
         const review = await tx.review.create({
           data: {
             customerId,
-            orderId: payload.orderId,
+            orderId: payload.orderId || undefined,
             medicineId: payload.medicineId,
             rating: payload.rating,
             comment: payload.comment,
